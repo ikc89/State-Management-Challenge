@@ -1,33 +1,49 @@
 # State Management Uygulaması
 
-Temel bir state yönetimi API uygulamasıdır. **_Task yaratma, State yaratma, Flow yaratma_** ve **Task durumunu güncelleme, durumunu görüntüleme ve bir Task için t zamanındaki durumuna döndürülebilme** işlemleri yapmaktadır.
+State management uygulaması bir state yönetimi API uygulamasıdır ve;
+
+- Task, State ve Flow yaratma
+- Task durumunu güncelleme ve görüntüleme
+- Task'ı **t** anındaki durumuna geri alma
+
+işlemlerini yapmaktadır.
 
 ## Hikaye
 
-Diyelim ki 4 adet state yaratıyoruz. Bunlar `StateA`, `StateB`, `StateC` ve `StateD` olsun. Ve bir adet `Task` yaratıyoruz. Bunun da ismi `Task1` olsun.
+Diyelim ki 4 adet `State` (`StateA`, `StateB`, `StateC` ve `StateD`) ve
+`StateA` durumunda olan bir adet `Task` yaratıyoruz (`Task1`).
+
+Sonra bir `Task`ın izleyeceği yolu belirlemek için bir `Flow` yaratıyoruz
+(`FLowX`), bu sayede `StateA` <--> `StateB` <--> `StateC` <--> `StateD` akışı
+mümkün oluyor.
 
 | StateA | StateB | StateC | StateD |
 | ------ | ------ | ------ | ------ |
-| Task1  |        |        |
+| Task1  |        |        |        |
 
-Ve sonra da `Task1`in izleyeceği yolu belirlemek için `Flow` yaratıyoruz. Yani yukaridaki tablonun `Flow` açıklaması şu şekilde:
-Sırası ile `StateA` <--> `StateB` <--> `StateC` <--> `StateD` yapabilir. Fakat `StateA`'dan `StateC`'ye geçemez. Ama flow'u bu şekilde de düzenleyebilirdik;
+Bu `Flow` gereği `Task1`, `StateA`'dan `StateB`'ye geçebilir ancak `StateC`'ye
+_geçemez_. 
 
-| StateA | StateC | StateB | StateD |
-| ------ | ------ | ------ | ------ |
-| Task1  |        |        |
-
-**Task1** artık `StateA`'dan `StateC`'ye geçebilir. Fakat `StateA`'dan `StateB`ye **geçemez.**
+> 
+> Ama flow'u bu şekilde de düzenleyebilirdik;
+> 
+> | StateA | StateC | StateB | StateD |
+> | ------ | ------ | ------ | ------ |
+> | Task1  |        |        |        |
+> 
+> `Task1` artık `StateA`'dan `StateC`'ye geçebilir ancak `StateA`'dan
+> `StateB`ye _geçemez_.
+> 
 
 ---
 
-| StateA | StateB         | StateC | StateD |
-| ------ | -------------- | ------ | ------ |
-|        | <--- Task1 --> |        |
+| StateA | StateB        | StateC | StateD |
+| ------ | ------------- | ------ | ------ |
+|        | <-- Task1 --> |        |        |
 
-**Task1** bulunduğu state'ten **bir önceki** state'e dönebilir ve **bir sonraki** state'e geçebilir.
-yani;
-**Task1** artık `StateB`'den `StateC`'ye geçebilir ve `StateB`'den `StateA`'ya geçebilir. `StateB`'den `StateD`'ye geçemez.
+`Task1` bulunduğu durumdan _bir önceki_ duruma dönebilir ve _bir sonraki_
+duruma geçebilir. Yani `Task1`, `StateB`'den `StateC`'ye ya da `StateA`'ya
+geçebilir ancak `StateD`'ye geçemez.
 
 ---
 
@@ -45,44 +61,51 @@ Farklı bir `Flow` yaratıp onun içerisinde de farklı tasklar yürütebilirim.
 
 ---
 
-Bir `Task` herhangi bir t anındaki durumuna geri döndürülebilir olmalıdır.
+Bir `Task` herhangi bir **t** anındaki durumuna geri döndürülebilir olmalıdır.
 
 ---
 
 ### Teknik Açıklama
 
-Uygulama üzerindeki `Task`, `State`, `Flow` nesneleri `CREATE`, `READ`, `UPDATE`, `DELETE` ve diğer işlemleri için API çağrıları kullanılacaktır.
+Uygulama üzerindeki `Task`, `State`, `Flow` nesneleri `CREATE`, `READ`,
+`UPDATE`, `DELETE` ve diğer işlemleri için API çağrıları kullanılacaktır.
 
 [Restful Methods](https://restfulapi.net/http-methods/)
 
 ### Teknik gereksinimler
 
-**Teknolojiler**
+#### Teknolojiler
 
 - Platform: .NET Core 2 ve üstü
 - IoC Kütüphanesi: Herhangi bir IoC container kullanılabilir.
 - ORM Kütüphanesi: Herhangi bir kütüphane kullanılabilir.
 - Database: Herhangi bir database.
-- API( ve kullanılan diğer toollar)  docker üzerinde run edilebilir.
+- API (ve kullanılan diğer toollar) docker üzerinde run edilebilir.
 
-**Dependency Injection**
+#### Dependency Injection
 
-- ApiController sınıfları da dahil olmak üzere tüm sınıflar Dependency Injenction ile sağlanmalıdır.
+- ApiController sınıfları da dahil olmak üzere tüm sınıflar Dependency
+  Injenction ile sağlanmalıdır.
 
-**Repository Pattern**
+#### Repository Pattern
 
 - Servis katmanı ile veri erişim katmanı ayrıştırılmalıdır.
 
 ### İpucu
 
 - Clean code güzel hazırlanmış bir pazar kahvaltısı gibidir.
-- Unit test yazmak hava biraz kapalı olsa bile yanına şemsiyesini alan bir insanın tutumu gibidir.
+- Unit test yazmak hava biraz kapalı olsa bile yanına şemsiyesini alan bir
+  insanın tutumu gibidir.
 - Bir entitynin durumuna event-centric yaklaşmak güzel bir bakış açısıdır.
 - Swagger yararlı bir API doc tooludur.
-
+- Her commit projeye yapılan anlamlı bir eklemedir.
 
 ### Teslim
 
-- Bu repository'i fork edip, kendi Github hesabınız üzerinden geliştirmeyi yapınız. 
-- İlk comitinizi `Initial Commit` mesajıyla gönderiniz ve tüm projeyi max 4 gün içinde bitirmeniz beklenmektedir.
-- Projeyi tamamladığınızda reponun adresini erdem@proceedlabs.com adresine `Backend Developer - State Management Challange` başlığı ile yollayınız.
+- Bu repository'i fork edip, kendi Github hesabınız üzerinden geliştirmeyi
+  yapınız. 
+- İlk commitinizi `initial commit` mesajıyla gönderiniz ve tüm projeyi max 4
+  gün içinde bitirmeniz beklenmektedir.
+- Projeyi tamamladığınızda sizinle iletişim kuran kişiye e-posta olarak dönüş
+  yapınız.
+
