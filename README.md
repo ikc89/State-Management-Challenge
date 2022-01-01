@@ -114,7 +114,7 @@ Dilerseniz diğer işlemler için de önyüz hazırlayabilirsiniz, size bırakı
 - Clean code güzel hazırlanmış bir pazar kahvaltısı gibidir.
 - Unit test yazmak hava biraz kapalı olsa bile yanına şemsiyesini alan bir
   insanın tutumu gibidir.
-- Bir entitynin durumuna event-centric yaklaşmak güzel bir bakış açısıdır.
+- Bir entity'nin durumuna event-centric yaklaşmak güzel bir bakış açısıdır.
 - Swagger yararlı bir API doc tooludur.
 - Her commit projeye yapılan anlamlı bir eklemedir.
 
