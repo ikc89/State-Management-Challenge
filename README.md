@@ -97,7 +97,7 @@ Dilerseniz diğer işlemler için de önyüz hazırlayabilirsiniz, size bırakı
 - ORM Kütüphanesi: Herhangi bir kütüphane kullanılabilir.
 - Database: Herhangi bir database.
 - API (ve kullanılan diğer toollar) docker üzerinde run edilebilir.
-- UI için [Vue.js](https://vuejs.org/) ya da `React`(https://reactjs.org/)
+- UI için [Vue.js](https://vuejs.org/) ya da [React](https://reactjs.org/)
   kullanılabilir.
 
 #### Dependency Injection
