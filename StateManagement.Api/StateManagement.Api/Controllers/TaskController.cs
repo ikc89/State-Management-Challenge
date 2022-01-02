@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using StateManagement.Business.Handlers.Base;
 using StateManagement.Business.Services.Base;
+using StateManagement.Business.ViewModels;
 
 namespace StateManagement.Api.Controllers
 {
@@ -8,13 +10,16 @@ namespace StateManagement.Api.Controllers
     public class TaskController : ControllerBase
     {
         private readonly ITaskService _taskService;
+        private readonly ITaskStateHandler _taskStateHandler;
         private readonly ILogger<TaskController> _logger;
 
         public TaskController(
             ITaskService taskService,
+            ITaskStateHandler taskStateHandler,
             ILogger<TaskController> logger)
         {
             _taskService = taskService;
+            _taskStateHandler = taskStateHandler;
             _logger = logger;
         }
 
@@ -31,13 +36,13 @@ namespace StateManagement.Api.Controllers
         }
 
         [HttpPost]
-        public async Task CreateTaskAsync(Data.Entities.Task task, CancellationToken cancellationToken)
+        public async Task CreateTaskAsync(TaskViewModel task, CancellationToken cancellationToken)
         {
             await _taskService.CreateTaskAsync(task, cancellationToken);
         }
 
         [HttpPut]
-        public async Task UpdateTaskAsync(Data.Entities.Task task, CancellationToken cancellationToken)
+        public async Task UpdateTaskAsync(TaskViewModel task, CancellationToken cancellationToken)
         {
             await _taskService.UpdateTaskAsync(task, cancellationToken);
         }
@@ -46,6 +51,24 @@ namespace StateManagement.Api.Controllers
         public async Task DeleteTaskAsync(int id, CancellationToken cancellationToken)
         {
             await _taskService.DeleteTaskAsync(id, cancellationToken);
+        }
+
+        [HttpPost("{id}/next")]
+        public async Task MoveNextAsync(int id, CancellationToken cancellationToken)
+        {
+            await _taskStateHandler.MoveToNextState(id, cancellationToken);
+        }
+
+        [HttpPost("{id}/previous")]
+        public async Task MovePreviousAsync(int id, CancellationToken cancellationToken)
+        {
+            await _taskStateHandler.MoveToPreviousState(id, cancellationToken);
+        }
+
+        [HttpPost("undo")]
+        public async Task UndoAsync(CancellationToken cancellationToken)
+        {
+            await _taskStateHandler.UndoLastMove(cancellationToken);
         }
     }
 }

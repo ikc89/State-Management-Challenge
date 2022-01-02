@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using StateManagement.Business.Handlers;
+using StateManagement.Business.Handlers.Base;
 using StateManagement.Business.Services;
 using StateManagement.Business.Services.Base;
 using StateManagement.Data.Context;
@@ -14,6 +16,16 @@ builder.Configuration.AddJsonFile($"appsettings.{environment.EnvironmentName}.js
 
 ConfigurationManager configuration = builder.Configuration;
 
+var allowedOrigins = "AllowedOrigins";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: allowedOrigins,
+                      builder =>
+                      {
+                          builder.WithOrigins("*");
+                      });
+});
+
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -27,6 +39,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IFlowService, FlowService>();
 builder.Services.AddScoped<IStateService, StateService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
+builder.Services.AddScoped<ITaskStateHandler, TaskStateHandler>();
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -40,6 +53,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors(allowedOrigins);
 
 app.UseAuthorization();
 

@@ -1,4 +1,6 @@
-﻿using StateManagement.Data.Entities;
+﻿using StateManagement.Api.ViewModels;
+using StateManagement.Business.ViewModels;
+using StateManagement.Data.Entities;
 using Task = System.Threading.Tasks.Task;
 
 namespace StateManagement.Business.Services.Base
@@ -10,5 +12,7 @@ namespace StateManagement.Business.Services.Base
         IEnumerable<Flow> GetFlows();
         Task<Flow?> GetFlowAsync(int id, CancellationToken cancellationToken);
         Task DeleteFlowAsync(int id, CancellationToken cancellationToken);
+        Task CreateFlowStateAsync(FlowStateViewModel model, CancellationToken cancellationToken);
+        Task<IEnumerable<FlowStateTaskViewModel>> GetFlowStatesByFlowIdAsync(int id, CancellationToken cancellationToken);
     }
 }

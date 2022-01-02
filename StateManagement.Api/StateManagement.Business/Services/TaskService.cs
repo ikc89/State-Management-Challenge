@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using StateManagement.Business.Services.Base;
+using StateManagement.Business.ViewModels;
 using StateManagement.Data.Repositories.Base.Interfaces;
 
 namespace StateManagement.Business.Services
@@ -17,19 +19,35 @@ namespace StateManagement.Business.Services
             _logger = logger;
         }
 
-        public async Task CreateTaskAsync(Data.Entities.Task task, CancellationToken cancellationToken)
+        public async Task CreateTaskAsync(TaskViewModel model, CancellationToken cancellationToken)
         {
+            var task = new Data.Entities.Task
+            {
+                Name = model.Name,
+                FlowId = model.FlowId,
+                StateId = model.StateId
+            };
+
             await _unitOfWork.Tasks.AddAsync(task, cancellationToken);
             await _unitOfWork.CommitAsync(cancellationToken);
         }
 
-        public async Task UpdateTaskAsync(Data.Entities.Task model, CancellationToken cancellationToken)
+        public async Task UpdateTaskAsync(TaskViewModel model, CancellationToken cancellationToken)
         {
             var task = await _unitOfWork.Tasks.SingleOrDefaultAsync(x => x.Id == model.Id && x.DeleteDate == null, cancellationToken);
             if (task == null)
             {
                 throw new Exception($"Task is not found or may be deleted with id: {model.Id}");
             }
+
+            var flow = await _unitOfWork.Flows.SingleOrDefaultAsync(x => x.Id == model.Id && x.DeleteDate == null, cancellationToken);
+            if (flow == null)
+            {
+                throw new Exception($"Flow is not found or may be deleted with id: {model.Id}");
+            }
+
+            task.FlowId = model.FlowId != 0 ? model.FlowId : task.FlowId;
+            task.StateId = model.StateId;
 
             _unitOfWork.Tasks.Update(task);
             await _unitOfWork.CommitAsync(cancellationToken);
@@ -42,7 +60,7 @@ namespace StateManagement.Business.Services
 
         public async Task<Data.Entities.Task?> GetTaskAsync(int id, CancellationToken cancellationToken)
         {
-            return await _unitOfWork.Tasks.GetByIdAsync(id, cancellationToken);
+            return await _unitOfWork.Tasks.GetAllAsQuery().Where(x => x.Id == id).Include(x => x.CurrentFlow).ThenInclude(x => x.States).FirstOrDefaultAsync(cancellationToken);
         }
 
         public async Task DeleteTaskAsync(int id, CancellationToken cancellationToken)
@@ -56,6 +74,25 @@ namespace StateManagement.Business.Services
             task.DeleteDate = DateTime.UtcNow;
 
             _unitOfWork.Tasks.Update(task);
+            await _unitOfWork.CommitAsync(cancellationToken);
+        }
+
+        public IQueryable<Data.Entities.TaskStateHistory> GetTaskStateHistory()
+        {
+            return _unitOfWork.TaskStateHistory.GetAllAsQuery().Where(x => x.DeleteDate == null);
+        }
+
+        public async Task DeleteTaskStateHistoryAsync(int id, CancellationToken cancellationToken)
+        {
+            var taskStateHistory = await _unitOfWork.TaskStateHistory.SingleOrDefaultAsync(x => x.Id == id && x.DeleteDate == null, cancellationToken);
+            if (taskStateHistory == null)
+            {
+                throw new Exception($"Task state history is not found or may be deleted with id: {id}");
+            }
+
+            taskStateHistory.DeleteDate = DateTime.UtcNow;
+
+            _unitOfWork.TaskStateHistory.Update(taskStateHistory);
             await _unitOfWork.CommitAsync(cancellationToken);
         }
     }

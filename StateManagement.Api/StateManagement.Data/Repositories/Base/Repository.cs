@@ -41,9 +41,9 @@ namespace StateManagement.Data.Repositories.Base
             return Context.Set<TEntity>();
         }
 
-        public ValueTask<TEntity?> GetByIdAsync(int id, CancellationToken cancellationToken)
+        public async ValueTask<TEntity?> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
-            return Context.Set<TEntity>().FindAsync(id, cancellationToken);
+            return await Context.Set<TEntity>().FindAsync(id);
         }
 
         public void Remove(TEntity entity)

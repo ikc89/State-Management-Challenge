@@ -4,5 +4,6 @@ namespace StateManagement.Data.Entities
 {
     public class State : BaseEntity
     {
+        public string Name { get; set; }
     }
 }
